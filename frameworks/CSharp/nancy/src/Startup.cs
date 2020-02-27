@@ -1,29 +1,33 @@
 ﻿namespace Nancy.Benchmark
 {
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
     using Nancy.Owin;
 
     public class Startup
     {
-        private readonly IConfiguration config;
+        public IConfiguration Configuration { get; }
+
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+#if NETFRAMEWORK
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                               .AddJsonFile("appsettings.json")
                               .SetBasePath(env.ContentRootPath);
 
-            config = builder.Build();
+            Configuration = builder.Build();
         }
-
-        public void ConfigureServices(IServiceCollection services) { }
+#endif
 
         public void Configure(IApplicationBuilder app)
         {
             var appConfig = new AppConfiguration();
-            ConfigurationBinder.Bind(config, appConfig);
+            ConfigurationBinder.Bind(Configuration, appConfig);
 
             app.UseOwin(x => x.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(appConfig)));
         }

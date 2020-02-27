@@ -9,7 +9,7 @@
         public static void Main(string[] args)
         {
             var config = new ConfigurationBuilder()
-                .AddJsonFile("hosting.json", optional: true)
+               .AddJsonFile("hosting.json", optional: true)
                .AddEnvironmentVariables(prefix: "ASPNETCORE_")
                .AddCommandLine(args)
                .Build();
@@ -18,7 +18,10 @@
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseConfiguration(config)
                 .UseStartup<Startup>()
-                .UseKestrel()
+                .UseKestrel(o =>
+                {
+                    o.AllowSynchronousIO = true;
+                })
                 .Build();
 
             webHost.Run();
